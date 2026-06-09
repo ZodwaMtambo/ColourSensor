@@ -4,8 +4,6 @@ from PIL import Image
 image = Image.open ("images/20221225_174227.jpg")
 
 image_array = np.array(image)
-
-print("shape", image_array.shape)
 print("Top-left pixel:", image_array[0,0])
 print("Center pixel:", image_array[1500,2000])
 print("Top-right:", image_array[0, 3999])
