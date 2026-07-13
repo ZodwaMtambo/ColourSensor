@@ -25,39 +25,47 @@ print("image2 shape:", image2_array.shape)
 print ("image1 size:", image1_array.size)
 print("image1 shape:", image1_array.shape)
 
-#reshaping. 
-Ex_image = image2_array.reshape(-1,3)
-print ("plain picture 2D list:", Ex_image)
-print (" New shape", Ex_image.shape)
-
-#k-means
-from sklearn.cluster import KMeans
-
-model = KMeans (n_clusters= 3, random_state= 42)
-X = model.fit_predict(Ex_image)
-print("cluster groups :", X)
-
-dominant_colours = model.cluster_centers_.astype(int)
-print ("dominant colours are:", dominant_colours)
-
-# Phase3 
-for  cluster in dominant_colours:
-    min_distance = float("inf")
-    closest_name = None
-
-    for name in webcolors.names("css3"):
-        named_rgb = webcolors.name_to_rgb(name)
-
-        distance = np.sqrt(
-            (int(cluster[0]) - named_rgb.red) ** 2 +
-            (int(cluster[1]) - named_rgb.green) ** 2 +
-            (int(cluster[2]) - named_rgb.blue) ** 2
-        )
-            
-        if distance < min_distance:
-                min_distance = distance
-                closest_name = name
-        
-        colour_name = closest_name
+def detect_colours(image, n_clusters):
+    #reshaping. 
+    image_array = np.array(image)
+    pixels = image_array.reshape(-1, 3)
     
-    print(f"RGB {tuple(int(c) for c in cluster)} -> {closest_name}")
+    print ("plain picture 2D list:", image)
+    print("New shape", image_array.shape)
+
+    #k-means
+    from sklearn.cluster import KMeans
+
+    model = KMeans (n_clusters= n_clusters, random_state= 42)
+    X = model.fit_predict(pixels)
+    print("cluster groups :", X)
+
+    dominant_colours = model.cluster_centers_.astype(int)
+    print ("dominant colours are:", dominant_colours)
+
+    # Phase3 
+    results = ""
+    for  cluster in dominant_colours:
+        min_distance = float("inf")
+        closest_name = None
+
+        for name in webcolors.names("css3"):
+            named_rgb = webcolors.name_to_rgb(name)
+
+            distance = np.sqrt(
+                (int(cluster[0]) - named_rgb.red) ** 2 +
+                (int(cluster[1]) - named_rgb.green) ** 2 +
+                (int(cluster[2]) - named_rgb.blue) ** 2
+            )
+                
+            if distance < min_distance:
+                    min_distance = distance
+                    closest_name = name
+            
+            colour_name = closest_name
+        
+        results += (f"RGB {tuple(int(c) for c in cluster)} -> {closest_name}\n")
+    
+    return results
+
+print(detect_colours(Image.open("images/Image 1.jpeg"), 3))
